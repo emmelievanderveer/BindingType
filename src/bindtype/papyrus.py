@@ -6,7 +6,7 @@ import pandas as pd
 from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
 
-from .annotation import ClassA_GPCR_HierachicalBindingTypeAnnotation, Kinase_AllostericAnnotation
+from .annotation import ClassA_GPCR_HierachicalBindingTypeAnnotation, Kinase_AllostericAnnotation, CaV_HierarchicalBindingTypeAnnotation
 
 def add_binding_type_to_papyrus(df : pd.DataFrame, target_type : str = 'GPCR', sources : str = 'both', similarity : bool = False, similarity_th : float = 0.8) -> pd.DataFrame:
     
@@ -59,6 +59,8 @@ def add_binding_type_to_papyrus(df : pd.DataFrame, target_type : str = 'GPCR', s
         parser = ClassA_GPCR_HierachicalBindingTypeAnnotation()
     elif target_type == 'Kinase':
         parser = Kinase_AllostericAnnotation()
+    elif target_type == 'CaV':
+        parser = CaV_HierarchicalBindingTypeAnnotation()
     else:
         raise ValueError('Unknown target type')
         

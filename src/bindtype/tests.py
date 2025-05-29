@@ -3,10 +3,10 @@ import pandas as pd
 
 from unittest import TestCase
 
-from .annotation import ClassA_GPCR_HierachicalBindingTypeAnnotation, Kinase_AllostericAnnotation
+from .annotation import ClassA_GPCR_HierachicalBindingTypeAnnotation, Kinase_AllostericAnnotation, CaV_HierarchicalBindingTypeAnnotation
 from .papyrus import add_binding_type_to_papyrus
 
-# TODO : add test for differnt methods in annotation.py
+# TODO : add test for different methods in annotation.py
 # class TestAnnotation(TestCase):
 
 class TestPapyrus(TestCase):
@@ -25,6 +25,12 @@ class TestPapyrus(TestCase):
 
     def test_gpcr_without_similarity(self):
         df = add_binding_type_to_papyrus(self.df_AR, target_type='GPCR', sources='both', similarity=False)
+
+    def test_cav_with_similarity(self):
+        df = add_binding_type_to_papyrus(self.df_AR, target_type='CaV', sources='both', similarity=True, similarity_th=0.8)
+
+    def test_cav_without_similarity(self):
+        df = add_binding_type_to_papyrus(self.df_AR, target_type='CaV', sources='both', similarity=False)
         
 
 

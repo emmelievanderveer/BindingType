@@ -3,9 +3,10 @@ Package to annote binding type of bioactivity measures based on keyword search o
 - __abstracts__ from PubMed, PubChem assay description, CrossRef or Google Patents
 - __assay descriptions__ from ChEMBL assay descriptions
 
-The annotation is currently supported for two types of targets
-- __Class A GPCRs__ with a 3-level hierarchical keyword search to annotate compounds as _orthosteric, allosteric, bitopic, covalent_ or  _unknown_ based work in [Burggraaf et al., J. Chem. Inf. Model. (2020)](https://doi.org/10.1021/acs.jcim.0c00695)
+The annotation is currently supported for three types of targets
+- __Class A GPCRs__ with a 3-level hierarchical keyword search to annotate compounds as _orthosteric, allosteric, bitopic, covalent_ or  _unknown_ based on work in [Burggraaf et al., J. Chem. Inf. Model. (2020)](https://doi.org/10.1021/acs.jcim.0c00695)
 - __Protein Kinases__ with 1-level keyword search to annotate compounds as _allosteric_ or _unknown_ based (extended) keywords from [Christmann-Franck et al., J. Chem. Inf. Model. (2016)](https://doi.org/10.1021/acs.jcim.6b00122)
+- __Voltage-Gated Calcium Channels (VGCCs)__ with a 3-level hierarchical keyword search to annotate compounds as _orthosteric, allosteric, bitopic, covalent_ or  _unknown_ based on work in [Burggraaf et al., J. Chem. Inf. Model. (2020)](https://doi.org/10.1021/acs.jcim.0c00695)
 
 # Getting started
 
@@ -23,12 +24,12 @@ The package has both an API and a CLI which can process either
 
 In the case of Papyrus-dataframe, the annotation will a new `BindingType` column to the dataframe and can be done from the command line with
 ```
-bindtype_papyrus -i <dataset.csv/.tsv> -tt <GPCR/Kinase>
+bindtype_papyrus -i <dataset.csv/.tsv> -tt <GPCR/Kinase/CaV>
 ```
 or with the API with
 ```
 from bindtype.papyrus import add_binding_type_to_papyrus
-df = add_binding_type_to_papyrus(df, target_type=GPCR/Kinase)
+df = add_binding_type_to_papyrus(df, target_type=GPCR/Kinase/CaV)
 ```
 
 There is also an option to annotate all 'unknown' compounds that based on their Tanimoto similarity to the annotated compounds: `-sim, --similarity` flag in the CLI and `similarity=True` in the API.
@@ -37,7 +38,7 @@ There is also an option to annotate all 'unknown' compounds that based on their 
 
 In the more general case, the annotation will create dictionaries based list of document IDs and/or assays IDs. This can be done either from the command line with
 ```
-bindtype -did <document_id_file_path> -aid <assay_id_file_path> -tt <GPCR/Kinase>
+bindtype -did <document_id_file_path> -aid <assay_id_file_path> -tt <GPCR/Kinase/CaV>
 ```
 or with the API with 
 ```
@@ -48,6 +49,10 @@ parser = ClassA_GPCR_HierachicalBindingTypeAnnotation()
 # for the kinases
 from bindtype import Kinase_AllostericAnnotation
 parser = Kinase_AllostericAnnotation()
+
+# for the VGCCc
+from bindtype import CaV_HierarchicalBindingTypeAnnotation
+parser = CaV_HierarchicalBindingTypeAnnotation()
 
 # Only abstracts
 dct_doc_annotations = parser(document_ids=list_of_document_ids)

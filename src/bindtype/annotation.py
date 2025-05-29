@@ -302,5 +302,94 @@ class ClassA_GPCR_HierachicalBindingTypeAnnotation(BindingTypeAnnotation):
         elif count1 < count2: return 1
         else: return 2    
 
+class CaV_HierarchicalBindingTypeAnnotation(BindingTypeAnnotation):
+    
+    """ Annotate binding type of VGCCs based on hierarchical keywords in abstracts or assay descriptions """
 
+    def __init__(self):
+        super().__init__()
+        self.annotate = self.hierarchichal_binding_site_attribution
+
+
+    def hierarchichal_binding_site_attribution(self, text):
+        
+        """ Attributes compound binding type by text mining a string with hierarchical classification on keywords
+        
+        Parameters:
+            text (str): str to be mined
+        
+        Returns:
+            site (str): 'Orthosteric', 'Allosteric', 'Bitopic', 'Covalent' or 'Unknown'
+        """
+        text = text.lower()
+        site = None
+
+        # Load keywords
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'CaV_hierarchical_keywords.json'), 'r') as f:
+            keywords = json.load(f)
+        for k, v in keywords.items(): keywords[k] = [item.lower() for item in v]
+        
+        if any(item in text for item in keywords['Bitopic']): # Check if ligand binds to both sites
+            site = 'Bitopic'
+        
+        elif any(item in text for item in keywords['Covalent']): # Check if ligand binds covalently
+            site = 'Covalent'
+        
+        else: # If not, -- 1. level allo/ortho parsing
+            
+            if any(item in text for item in keywords['Allo1']): # Contains 1. level allosteric keyword
+                
+                if not any(item in text for item in keywords['Ortho1']): # Does not contain a 1. level orthosteric keyword
+                    site = 'Allosteric'
+                else: # Contains both types of 1. level keywords
+                    x = self.compare_frequency_in_string(text, keywords['Allo1'], keywords['Ortho1'])
+                    if x == 0 : site = 'Allosteric'
+                    if x == 1 : site = 'Orthosteric'
+
+            elif any(item in text for item in keywords['Ortho1']): # Contains only 1. level orthosteric keyword
+                site = 'Orthosteric'
+            
+        if site == None: # Does not contain any or same number 1. level keywords -- 2. level allo/ortho parsing
+
+            if any(item in text for item in keywords['Allo2']): # Contains 2. level allosteric keyword
+
+                if not any(item in text for item in keywords['Ortho2']): # Does not contain a 2. level orthosteric keyword
+                    site = 'Allosteric'
+                else: # Contains both types of 2. level keywords
+                    x = self.compare_frequency_in_string(text, keywords['Allo2'], keywords['Ortho2'])
+                    if x == 0 : site = 'Allosteric'
+                    if x == 1 : site = 'Orthosteric'
+
+            elif any(item in text for item in keywords['Ortho2']): # Contains only 2. level orthosteric keyword
+                site = 'Orthosteric'
+
+        if site == None: # Does not contain any or same number 2. level keywords -- 3. level allo/ortho parsing
+            
+            if any(item in text for item in keywords['Ortho3']):
+                site = 'Orthosteric'
+            else:
+                site = 'Unknown'
+                
+        return site
+
+    def compare_frequency_in_string(self, text, lst1, lst2):
+        
+        """ Counts and compares how times elements of two lists of strings are presenet in a string.
+        
+        Paremeters:
+            text (str)
+            lst1 (list of str)
+            lst2 (list of str)
+        Returns:
+            0 if elements of lst1 more present than of lst2 in text
+            1 if elements of lst2 more present that of lst1 in text
+            2 if elements of lst1 and lst2 equally present in text
+        """
+        
+        count1, count2 = 0, 0
+        for item in lst1: count1 += text.count(item)
+        for item in lst2: count2 += text.count(item)
+        if count1 > count2: return 0
+        elif count1 < count2: return 1
+        else: return 2  
 
