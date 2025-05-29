@@ -12,7 +12,7 @@ The annotation is currently supported for three types of targets
 
 ## Install
 
-    pip install git+https://github.com/sohviluukkonen/BindingType.git@main
+    pip install git+https://github.com/emmelievanderveer/BindingType.git@main
 
 ## Usage
 
